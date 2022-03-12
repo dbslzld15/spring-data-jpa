@@ -9,7 +9,9 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -137,5 +139,39 @@ class MemberRepositoryTest {
         List<MemberDto> memberDto = memberRepository.findMemberDto();
         //then
         assertThat(memberDto.get(0).getTeamName()).isEqualTo("teamA");
+    }
+
+    @Test
+    public void findByNames() {
+        //given
+        Member member1 = new Member("AAA", 10);
+        Member member2 = new Member("BBB", 20);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        //when
+        List<Member> members = memberRepository.findByNames(Arrays.asList("AAA", "BBB"));
+        //then
+        assertThat(members.get(0).getUsername()).isEqualTo("AAA");
+        assertThat(members.get(1).getUsername()).isEqualTo("BBB");
+    }
+
+    @Test
+    public void returnType() throws Exception {
+        //given
+        Member member1 = new Member("AAA", 10);
+        Member member2 = new Member("BBB", 20);
+        Member member3 = new Member("BBB", 30);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
+        //when
+        Member findMember = memberRepository.findMemberByUsername("AAAB"); // 만약 찾고자하는 데이터가 없을 경우 단건조회의 경우 null값이 들어감
+        List<Member> members = memberRepository.findListByUsername("AAAB"); // 만약 찾고자하는 데이터가 없을경우 컬렉션은 null이 아니라 empty임
+        Optional<Member> optionalMember = memberRepository.findOptionalByUsername("AAAB"); //그렇기에 단건조회의 경우 Optional을 사용
+
+        // Member bMember = memberRepository.findMemberByUsername("BBB"); //이 부분은 다건이 조회되기때문에 예외가 터짐
+
+        //then
+
     }
 }
